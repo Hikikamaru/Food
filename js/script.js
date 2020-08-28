@@ -39,4 +39,61 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+    //Timer
+    const deadline = '2020-09-02';
+
+    function getTimeRamaining(endtime) {
+        const t = Date.parse(endtime) - Date.parse(new Date()), //Помістили  в endtime час який прийшов звідкісь і відняли теперішню дату та час
+            days = Math.floor /*Заокрглює до найближчого цілого */(t / (1000 * 60 * 60 * 24)), //Так ми отримаємо скільки мілісекунд в одному дні для щоб отримати значення в днях скільки залишилося до закінчення таймера
+            hours = Math.floor((t / (1000 * 60 * 60) % 24)), //Отримаємо скільки годин залишилось до кінця акції, %24 це той хвостик якого не вистачає до 24 годин і він буде повертатися в години тобто якщо до кінця акції 50 годин ми ділимо на 24 отримаємо цілих два дні  а 2 години підуть до годин в таймері 
+            minutes = Math.floor((t / 1000 / 60) % 60),
+            seconds = Math.floor((t / 1000) % 60);
+        return {
+            total: t,
+            days: days,
+            hours: hours,
+            minutes: minutes,
+            seconds: seconds
+        };
+
+    }
+
+    function getZero(num) {
+        if (num >= 0 && num < 10) {
+            return `0${num}`;
+        } else {
+            return num;
+        }
+    }
+
+
+
+    function setTimer(selector, endtime) {
+        const timer = document.querySelector(selector),
+            days = timer.querySelector('#days'),
+            hours = timer.querySelector('#hours'),
+            minutes = timer.querySelector('#minutes'),
+            seconds = timer.querySelector('#seconds '),
+            timeInterval = setInterval(updateClock, 500); //Ця констуркція робить так щоб updateClock оновлялась кожну секунду
+        updateClock();
+
+        function updateClock() { //Ця функція буде виводити наш час на сторінку
+            const t = getTimeRamaining(endtime)
+            days.innerHTML = getZero(t.days),
+                hours.innerHTML = getZero(t.hours),
+                minutes.innerHTML = getZero(t.minutes),
+                seconds.innerHTML = getZero(t.seconds);
+
+
+
+            if (t.total <= 0) { //Цей фунціонал зупиняє таймер коли внашому t закінчуються мілісекунди для цього ми його і рахували
+                clearInterval(timeInterval);
+            }
+
+
+
+        }
+    }
+    setTimer('.timer', deadline);
+    //В цьому кді при оновлені мє мигання в числах при оновленні сторінки цю проблему можна виправити просто визвавши фунцію updateClock() перед 
 });
