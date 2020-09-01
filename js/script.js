@@ -104,29 +104,43 @@ window.addEventListener('DOMContentLoaded', () => {
     const modalTrigger = document.querySelectorAll('[data-modal]'),
         modal = document.querySelector('.modal'),
         modalCloseBtn = document.querySelector('[data-close]');
+
+    function openModalWindow() {
+        modal.style.display = 'block'
+        document.body.style.overflow = 'hidden';
+    }
+
     modalTrigger.forEach(btn => { //Цей функціонал відповідає за відображення модального вікна при натискані на кнопку  можна було написати model.clasList.ada('show') model.clasList.ada('hide')  але це чомусь не працює  
-        btn.addEventListener('click', () => {
-            modal.style.display = 'block'
-            document.body.style.overflow = 'hidden'; //відповідає зате щоб при модальному вікні прокрутка не працювала
+        btn.addEventListener('click', openModalWindow);
+        //відповідає зате щоб при модальному вікні прокрутка не працювала
 
 
-        });
 
         function closeModalWindow() { //Відповідає за закриття модального вікна  
             modal.style.display = 'none';
             document.body.style.overflow = '';
+            clearInterval(modalSetTimeOut); //якщо користувач вже відкрив це модальне вікно то таймер  очиститься на modalSetTimeOut і вже не буде відкриватися
         }
 
         modalCloseBtn.addEventListener('click', closeModalWindow);
-        modal.addEventListener('click', (e) => {//закриття вікна при нажиманні за межами модального вікна 
+        modal.addEventListener('click', (e) => { //закриття вікна при нажиманні за межами модального вікна 
             if (e.target === modal) {
                 closeModalWindow(); //Відповідає за закриття модального вікна  
             }
         });
-        document.addEventListener('keydown', (e) => {//Цей функціонал відповідає за закриття вікна при нажиманні "Esc"
+        document.addEventListener('keydown', (e) => { //Цей функціонал відповідає за закриття вікна при нажиманні "Esc"
             if (e.code === 'Escape' && modal.style.display === 'block') {
                 closeModalWindow(); //Відповідає за закриття модального вікна  
             }
         })
     });
+const modalSetTimeOut = setTimeout(openModalWindow, 6000); //Модальне вікно зявиться через 15 секунд після того як користувач зайде на сторінку 
+function showModalByScroll(){
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight){
+        openModalWindow();
+        window.removeEventListener('scroll',showModalByScroll)
+    };
+       
+}
+    window.addEventListener('scroll',showModalByScroll) ;
 });
