@@ -95,5 +95,38 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
     setTimer('.timer', deadline);
-    //В цьому кді при оновлені мє мигання в числах при оновленні сторінки цю проблему можна виправити просто визвавши фунцію updateClock() перед 
+    //В цьому коді при оновлені мє мигання в числах при оновленні сторінки цю проблему можна виправити просто визвавши фунцію updateClock() перед 
+
+
+
+    // Modal window
+
+    const modalTrigger = document.querySelectorAll('[data-modal]'),
+        modal = document.querySelector('.modal'),
+        modalCloseBtn = document.querySelector('[data-close]');
+    modalTrigger.forEach(btn => { //Цей функціонал відповідає за відображення модального вікна при натискані на кнопку  можна було написати model.clasList.ada('show') model.clasList.ada('hide')  але це чомусь не працює  
+        btn.addEventListener('click', () => {
+            modal.style.display = 'block'
+            document.body.style.overflow = 'hidden'; //відповідає зате щоб при модальному вікні прокрутка не працювала
+
+
+        });
+
+        function closeModalWindow() { //Відповідає за закриття модального вікна  
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        modalCloseBtn.addEventListener('click', closeModalWindow);
+        modal.addEventListener('click', (e) => {//закриття вікна при нажиманні за межами модального вікна 
+            if (e.target === modal) {
+                closeModalWindow(); //Відповідає за закриття модального вікна  
+            }
+        });
+        document.addEventListener('keydown', (e) => {//Цей функціонал відповідає за закриття вікна при нажиманні "Esc"
+            if (e.code === 'Escape' && modal.style.display === 'block') {
+                closeModalWindow(); //Відповідає за закриття модального вікна  
+            }
+        })
+    });
 });
