@@ -1,11 +1,9 @@
 window.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.tabheader__item'),
-        /*Визиваємо елементи з якіми будемо працювати*/
         tabContent = document.querySelectorAll('.tabcontent'),
-        /*Визиваємо елементи з якіми будемо працювати*/
         tabPerent = document.querySelector('.tabheader__items'); /*Визиваємо елементи з якіми будемо працювати*/
     function hideTabContent() {
-        /*За допомогою ццієї фунції ми приховуємо всі таби та видаляємо всі активні класи на наших пунктах (Фінтес,..б,,)*/
+        /*За допомогою ццієї фунції ми приховуємо всі таби та видаляємо всі активні класи на наших пунктах (Фінтес,...,...,)*/
         tabContent.forEach(item => {
             item.style.display = 'none';
 
@@ -30,7 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const target = event.target;
 
         if (target && target.classList.contains('tabheader__item')) {
-            /*І пишемо що якщо клік користувача буде приходитись на наші пункти то ми перериваємо нашу колекцію та чкщо знаходимо співпадіння то визиваємо ті дві функції  */
+            /*І пишемо що якщо клік користувача буде приходитись на наші пункти то ми перериваємо нашу колекцію та якщо знаходимо співпадіння то визиваємо ті дві функції  */
             tabs.forEach((item, i) => {
                 if (target == item) {
                     hideTabContent();
@@ -40,7 +38,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
     //Timer
-    const deadline = '2020-09-02';
+    const deadline = '2020-09-08';
 
     function getTimeRamaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()), //Помістили  в endtime час який прийшов звідкісь і відняли теперішню дату та час
@@ -134,13 +132,57 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         })
     });
-const modalSetTimeOut = setTimeout(openModalWindow, 6000); //Модальне вікно зявиться через 15 секунд після того як користувач зайде на сторінку 
-function showModalByScroll(){
-    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight){
-        openModalWindow();
-        window.removeEventListener('scroll',showModalByScroll)
-    };
-       
+    //const modalSetTimeOut = setTimeout(openModalWindow, 6000); //Модальне вікно зявиться через 15 секунд після того як користувач зайде на сторінку 
+    function showModalByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+            openModalWindow();
+            window.removeEventListener('scroll', showModalByScroll) //Цей функціонал відповідає за те що при моменті коли користувач доскролив вниз сторінки ця фунція закривалась
+
+        };
+
+    }
+    window.addEventListener('scroll', showModalByScroll); // Показує модальне вікно коли користувач доскролив до кінця сторінки
+     //Patterning (Шаблонізація)
+    
+     class MenuCard{
+         constructor(src,alt,title,descr,price,parentSelector){
+             this.src=src;
+             this.alt=alt;
+             this.title=title;
+             this.descr=descr;
+             this.price=price;
+             this.parent=document.querySelector(parentSelector);
+             this.transfer=27;
+             this.changeToUAH();
+         }
+changeToUAH(){
+    this.price=this.price*this.transfer
 }
-    window.addEventListener('scroll',showModalByScroll) ;
-});
+render(){
+     const ghghtyt = document.createElement('div');
+     element.innerHTML=`
+     <div class="menu__item">
+                    <img src=${this.src} alt=${this.alt}>
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.descr}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>
+                </div>
+     `;
+     this.parent.append(element);
+}
+        }
+        new MenuCard(
+            "img/tabs/vegy.jpg",
+            "vegy",
+             'Меню "Фитнес"',
+             'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+             555,
+             '.menu.container'
+            
+        ).render();
+       
+}); 
