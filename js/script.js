@@ -38,7 +38,8 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
     //Timer
-    const deadline = '2020-09-08';
+  
+    const deadline = '2020-09-28';
 
     function getTimeRamaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()), //Помістили  в endtime час який прийшов звідкісь і відняли теперішню дату та час
@@ -46,13 +47,13 @@ window.addEventListener('DOMContentLoaded', () => {
             hours = Math.floor((t / (1000 * 60 * 60) % 24)), //Отримаємо скільки годин залишилось до кінця акції, %24 це той хвостик якого не вистачає до 24 годин і він буде повертатися в години тобто якщо до кінця акції 50 годин ми ділимо на 24 отримаємо цілих два дні  а 2 години підуть до годин в таймері 
             minutes = Math.floor((t / 1000 / 60) % 60),
             seconds = Math.floor((t / 1000) % 60);
-        return {
-            total: t,
-            days: days,
-            hours: hours,
-            minutes: minutes,
-            seconds: seconds
-        };
+            return {
+                'total' : t,
+                'hours' : hours,
+                'minutes' : minutes,
+                'seconds' : seconds,
+                'days': days
+            };
 
     }
 
@@ -77,15 +78,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
         function updateClock() { //Ця функція буде виводити наш час на сторінку
             const t = getTimeRamaining(endtime)
-            days.innerHTML = getZero(t.days),
+                days.innerHTML = getZero(t.days),
                 hours.innerHTML = getZero(t.hours),
                 minutes.innerHTML = getZero(t.minutes),
                 seconds.innerHTML = getZero(t.seconds);
 
 
 
-            if (t.total <= 0) { //Цей фунціонал зупиняє таймер коли внашому t закінчуються мілісекунди для цього ми його і рахували
+            
+            if (t.total <= 0) {//Цей фунціонал зупиняє таймер коли внашому t закінчуються мілісекунди для цього ми його і рахували
                 clearInterval(timeInterval);
+                
+                hours.textContent = '00';
+                minutes.textContent = '00';
+                seconds.textContent = '00';
             }
 
 
@@ -132,7 +138,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         })
     });
-    //const modalSetTimeOut = setTimeout(openModalWindow, 6000); //Модальне вікно зявиться через 15 секунд після того як користувач зайде на сторінку 
+    const modalSetTimeOut = setTimeout(openModalWindow, 6000); //Модальне вікно зявиться через 15 секунд після того як користувач зайде на сторінку 
     function showModalByScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
             openModalWindow();
@@ -159,7 +165,7 @@ changeToUAH(){
     this.price=this.price*this.transfer
 }
 render(){
-     const ghghtyt = document.createElement('div');
+     const element = document.createElement('div');
      element.innerHTML=`
      <div class="menu__item">
                     <img src=${this.src} alt=${this.alt}>
@@ -180,8 +186,28 @@ render(){
             "vegy",
              'Меню "Фитнес"',
              'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-             555,
-             '.menu.container'
+             9,
+             '.menu .container'
+            
+        ).render();
+
+        new MenuCard(
+            "img/tabs/elite.jpg",
+            "elite",
+             'Меню “Премиум”',
+             'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+             14,
+             '.menu .container'
+            
+        ).render();
+        
+        new MenuCard(
+            "img/tabs/post.jpg",
+            "post",
+             'Меню "Постное"',
+             'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+             21,
+             '.menu .container'
             
         ).render();
        
