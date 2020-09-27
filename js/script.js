@@ -106,8 +106,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Modal window
 
     const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        modalCloseBtn = document.querySelector('[data-close]');
+        modal = document.querySelector('.modal');
 
     function openModalWindow() {
         modal.style.display = 'block'
@@ -126,9 +125,9 @@ window.addEventListener('DOMContentLoaded', () => {
             clearInterval(modalSetTimeOut); //якщо користувач вже відкрив це модальне вікно то таймер  очиститься на modalSetTimeOut і вже не буде відкриватися
         }
 
-        modalCloseBtn.addEventListener('click', closeModalWindow);
+        
         modal.addEventListener('click', (e) => { //закриття вікна при нажиманні за межами модального вікна 
-            if (e.target === modal) {
+            if (e.target === modal|| e.target.getAttribute('data-close') =='') {
                 closeModalWindow(); //Відповідає за закриття модального вікна  
             }
         });
@@ -138,7 +137,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         })
     });
-    const modalSetTimeOut = setTimeout(openModalWindow, 6000); //Модальне вікно зявиться через 15 секунд після того як користувач зайде на сторінку 
+    const modalSetTimeOut = setTimeout(openModalWindow, 60000); //Модальне вікно зявиться через 15 секунд після того як користувач зайде на сторінку 
     function showModalByScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
             openModalWindow();
@@ -151,7 +150,7 @@ window.addEventListener('DOMContentLoaded', () => {
     //Patterning (Шаблонізація)
 
     class MenuCard {
-        constructor(src, alt, title, descr, price, parentSelector, ...classes) {
+        constructor(src, alt, title, descr, price, parentSelector, ...classes) {//Створюємо спільну модель для шаблонізації нових карточок
             this.src = src;
             this.alt = alt;
             this.title = title;
@@ -162,11 +161,11 @@ window.addEventListener('DOMContentLoaded', () => {
             this.transfer = 27;
             this.changeToUAH();
         }
-        changeToUAH() {
+        changeToUAH() {//Фцнкція відповідає затрансформацію валюти взяли сталу цифру в парктиці дані можуть приходити з серверу 
             this.price = this.price * this.transfer
         }
         render() {
-            const element = document.createElement('div');
+            const element = document.createElement('div');//Тут ми і забезпечуємо нашу шаблонізацію тобто всі нові елементи які приходят будуть преревірятися на наявність класів якщо їх немає то ми будемо їх присвоювати тим самим і шаблонізуючи все
             if (this.classes.length === 0) {
                 this.element = 'menu__item';
                 element.classList.add(this.element);
@@ -189,7 +188,7 @@ window.addEventListener('DOMContentLoaded', () => {
             this.parent.append(element);
         }
     }
-    new MenuCard(
+    new MenuCard(//Цей пороце можна обернути в фунцію щоб не писати в ручну
         "img/tabs/vegy.jpg",
         "vegy",
         'Меню "Фитнес"',
@@ -221,9 +220,9 @@ window.addEventListener('DOMContentLoaded', () => {
     ).render();
 
     //Form
-    const forms = document.querySelectorAll('form');
+    const forms = document.querySelectorAll('form');//В цьому блоці коду ми робили форму для користувача з відправкою на сервер всіх даних які він вводить
     const message = {
-        loading: 'Загурузка',
+        loading: 'img\form\spinner.svg',//Кнопка завантаження (стандартний кружечок)працює не коректно 
         success: 'Спасибо!Скоро мы с вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
@@ -231,13 +230,16 @@ window.addEventListener('DOMContentLoaded', () => {
         postData(item);
     });
 
-    function postData(form) {
+    function postData(form) {//цей блок коду відповідаю за сам процес появи модального вікна для користувача що відбувається загрузка,збій,т.д
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const statusMessage = document.createElement('div');
-            statusMessage.classList.add('status');
-            statusMessage.textContent = message.loading;
-            form.append(statusMessage);
+            const statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText =`
+            display: block;
+            margin: 0 auto;
+            ` ;
+            form.insertAdjacentElement('afterend',statusMessage);//момент відправки даних на сервер використовуюти як  XMLHttpRequest так і FormData тому ми і не пишемо заголовок що приходиь на сервер
             const request = new XMLHttpRequest();
             request.open('POST', 'server.php');
             //request.setRequestHeader('Content-type', 'multipart/form-data');
@@ -246,17 +248,44 @@ window.addEventListener('DOMContentLoaded', () => {
 
             request.addEventListener('load', () => {
                 if (request.status === 200) {
-                    statusMessage.textContent = message.success;
+                    console.log(request.response);
+                   showThanksModal(message.success);
                     form.reset();
-                    setTimeout(()=>{
+                    
                         statusMessage.remove();
-                    },2000)
                 } else {
-                    statusMessage.textContent = message.failure;
-                }
-            })
+                    showThanksModal (message.failure);
+                };
+                
 
-        })
+               
+            });
+
+        });
     }
+    function showThanksModal(message){//Функія відповідає за те що користувач бачить на сайті а конкретно модальне вікно з інформацією яка вже залежить від того що прийде від серверу
+        const prevModalDialog = document.querySelector('.modal__dialog');
+        prevModalDialog.classList.add('hide');
+        openModalWindow();
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML =`
+        <div class ="modal__content">
+        <div class = "modal__close" data-close>×</div>
+        <div class="modal__title">${message}</div>
+        </div>
+        `;
+        document.querySelector('.modal').append(thanksModal);
+        setTimeout(()=>{
+            thanksModal.remove();
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.add('hide');
+            closeModalWindow();
+        },4000)
+    }
+    
+
 
 });
+
+
