@@ -188,7 +188,26 @@ window.addEventListener('DOMContentLoaded', () => {
             this.parent.append(element);
         }
     }
-    new MenuCard(//Цей пороце можна обернути в фунцію щоб не писати в ручну
+    const getResource = async(url)=>{
+        const res =  await fetch(url);
+        if(!res.ok){
+             throw new Error(`Could not fetch ${url},status:${res.status}`);
+        }
+        return await res.json()
+    };
+    //getResource(' http://localhost:3000/menu')
+    //.then(data=>{
+//data.forEach(({img,altimg,title,descr,price})=>{
+//new MenuCard(img,altimg,title,descr,price,'.menu .container').render();
+//});
+    //});
+    axios.get(' http://localhost:3000/menu')
+    .then(data=>{
+        data.data.forEach(({img,altimg,title,descr,price})=>{
+        new MenuCard(img,altimg,title,descr,price,'.menu .container').render();
+        });
+    });
+   /* new MenuCard(//Цей пороце можна обернути в фунцію щоб не писати в ручну
         "img/tabs/vegy.jpg",
         "vegy",
         'Меню "Фитнес"',
@@ -217,7 +236,7 @@ window.addEventListener('DOMContentLoaded', () => {
         21,
         '.menu .container',
 
-    ).render();
+    ).render();*/
 
     //Form
     const forms = document.querySelectorAll('form');//В цьому блоці коду ми робили форму для користувача з відправкою на сервер всіх даних які він вводить
@@ -227,10 +246,19 @@ window.addEventListener('DOMContentLoaded', () => {
         failure: 'Что-то пошло не так...'
     };
     forms.forEach(item => {
-        postData(item);
+        blindpostData(item);
     });
-
-    function postData(form) {//цей блок коду відповідаю за сам процес появи модального вікна для користувача що відбувається загрузка,збій,т.д
+const postData = async(url,data)=>{
+    const res =  await fetch(url,{
+        method:"POST",
+                headers:{
+                    'Conten-type' :'application/json'
+                },
+                body:data
+    });
+    return await res.json()
+};
+    function blindpostData(form) {//цей блок коду відповідаю за сам процес появи модального вікна для користувача що відбувається загрузка,збій,т.д
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const statusMessage = document.createElement('img');
@@ -240,13 +268,29 @@ window.addEventListener('DOMContentLoaded', () => {
             margin: 0 auto;
             ` ;
             form.insertAdjacentElement('afterend',statusMessage);//момент відправки даних на сервер використовуюти як  XMLHttpRequest так і FormData тому ми і не пишемо заголовок що приходиь на сервер
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
+           
             //request.setRequestHeader('Content-type', 'multipart/form-data');
             const formData = new FormData(form);
-            request.send(formData);
+            const json = JSON.stringify(Object.fromEntries(formData.entries()))
+            /*fetch('server.php',{
+                method:"POST",
+                /*headers:{
+                    'Conten-type' :'application/json'
+                },
+                body:formData
+            }*/
+            postData('http://localhost:3000/requests',json)
+            .then(data=>{
+                console.log(data);
+                   showThanksModal(message.success);
+                    form.reset();
+            }).catch(()=>{
+                showThanksModal (message.failure);
+            }).finally(()=>{
+                form.reset();
+            })
 
-            request.addEventListener('load', () => {
+            /*request.addEventListener('load', () => {
                 if (request.status === 200) {
                     console.log(request.response);
                    showThanksModal(message.success);
@@ -259,7 +303,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 
 
                
-            });
+            });*/
 
         });
     }
@@ -283,8 +327,44 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModalWindow();
         },4000)
     }
+//Slider
+    const slides = document.querySelectorAll('.offer__slide'),
+    prev = document.querySelector('.offer__slider-prev'),
+    next= document.querySelector('.offer__slider-next'),
+    total= document.querySelector('#total'),
+    current = document.querySelector('#current');
+
+    let slideIndex = 1
+    showSlides(1);
+    
     
 
+    function showSlides(n){
+if(n>slides.length){
+slideIndex = 1
+};
+if(n < 1){
+    slideIndex =slides.length
+};
+slides.forEach(item =>item.style.display='none');
+slides[slideIndex-1].style.display='block'; 
+
+if(slides.length<10){
+    current.textContent=`0${slideIndex}`
+        }else{
+            current.textContent=slideIndex;
+        }
+
+    }
+    function plusSlides(n){
+        showSlides(slideIndex+=n);
+    }
+    prev.addEventListener('click',()=>{
+        plusSlides(-1);
+    });
+    next.addEventListener('click',()=>{
+        plusSlides(1);
+    })
 
 });
 
